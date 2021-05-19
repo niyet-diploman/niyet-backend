@@ -1,0 +1,6 @@
+stages:
+  - containerize
+
+include:
+  - project: 'ci-tools/templates'
+    file: 'containerize/docker-image.yml'

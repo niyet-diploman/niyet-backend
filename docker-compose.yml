@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  redis:
+    image: redis:6
+    restart: unless-stopped
+    ports:
+    - "6379:6379"
+  postgres:
+    image: postgres:11
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=niyet
+      - POSTGRES_PASSWORD=niyet
+      - POSTGRES_DB=niyet
+    ports:
+      - "15432:5432"
+  django:
+    image: niyet
+    restart: unless-stopped
+    init: true
+    stdin_open: true
+    tty: true
+    build:
+      context: .
+    volumes:
+      - .:/code
+    ports:
+      - "18000:8000"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - CONTAINER_ENVIRONMENT=local
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - WS_REDIS_HOST=redis
+      - WS_REDIS_PORT=6379
+      - DEPLOY=DJANGO_DEPLOY
+      - DATABASE_URL=psql://niyet:niyet@postgres:5432/niyet
+      - SECRET_KEY=SECRET_KEY
+      - EMAIL_URL=smtps://user@domain.com:bot123!%24%23@smtp.gmail.com:587
+
+networks:
+  default:
+    external:
+      name: niyet_default
