@@ -73,6 +73,8 @@ TEMPLATES = [
     },
 ]
 
+DISABLE_COLLECTSTATIC = 1
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
 DEVELOPMENT_MODE = True
