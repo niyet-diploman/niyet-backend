@@ -7,6 +7,9 @@ import os
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
+import sys
+import dj_database_url
+
 
 ROOT_DIR = environ.Path(
     __file__) - 2  # (monitoring_core/config/settings.py - 2 = monitoring_core/)
@@ -21,22 +24,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APP_DIR = os.path.join(BASE_DIR, 'app')
 
 SECRET_KEY = env.str('SECRET_KEY')
-
-CONTAINER_ENVIRONMENT = env.str('CONTAINER_ENVIRONMENT')
-
-repo = git.Repo(search_parent_directories=True)
-
-if CONTAINER_ENVIRONMENT in ['test', 'prod']:
-    sentry_sdk.init(
-        dsn=env.str('SENTRY_DSN', ''),
-        environment=CONTAINER_ENVIRONMENT,
-        integrations=[DjangoIntegration()],
-
-        # If you wish to associate users to errors (assuming you are using
-        # django.contrib.auth) you may enable sending PII data.
-        send_default_pii=True,
-        release=repo.head.object.hexsha,
-    )
 
 DEBUG = True
 
@@ -96,9 +83,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASES = {
-    'default': env.db(),
-}
+DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
+
+if DEVELOPMENT_MODE is True:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
+    }
+elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
+    if os.getenv("DATABASE_URL", None) is None:
+        raise Exception("DATABASE_URL environment variable not defined")
+    DATABASES = {
+        "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -200,22 +199,8 @@ SWAGGER_SETTINGS = {
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-SITE_URL = 'http://localhost:18000'
+# SITE_URL = 'http://localhost:18000'
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': env.str('REDIS_BROKER_URL', 'redis://redis:6379/1'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
-    }
-}
-
-
-if CONTAINER_ENVIRONMENT in ['test', 'prod']:
-    SITE_URL = 'http://niyet.trafficwave.kz'
-    MEDIA_ROOT = '/files'
 
 RESET_PASSWORD_EXPIRE = 600
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
