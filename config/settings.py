@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -156,6 +157,8 @@ MEDIA_URL = '/files/'
 STATIC_ROOT = os.path.join(ROOT_DIR, '/static')
 STATICFILES_DIRS = (os.path.join(APP_DIR, 'static'),)
 STATIC_URL = '/static/'
+
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 CODE_EXPIRATION_TIME = 10  # 10 minutes
 
