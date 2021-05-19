@@ -1,11 +1,7 @@
 from datetime import timedelta
 
 import environ
-import git
-
 import os
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 
 import sys
 
@@ -14,15 +10,11 @@ ROOT_DIR = environ.Path(
     __file__) - 2  # (monitoring_core/config/settings.py - 2 = monitoring_core/)
 
 # Load operating system environment variables and then prepare to use them
-env = environ.Env()
-
-env_file = str(ROOT_DIR.path('.env'))
-env.read_env(env_file)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APP_DIR = os.path.join(BASE_DIR, 'app')
 
-SECRET_KEY = env.str('SECRET_KEY')
+SECRET_KEY = 'SECRET_KEY'
 
 DEBUG = True
 
@@ -82,7 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
+DEVELOPMENT_MODE = True
 
 # if DEVELOPMENT_MODE is True:
  
@@ -171,14 +163,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 FROM_EMAIL = 'Niyet Team <niyet@gmail.com>'
 
-EMAIL_CONFIG = env.email_url('EMAIL_URL')
+EMAIL_CONFIG = 'EMAIL_URL'
 
 vars().update(EMAIL_CONFIG)
 
 GRAPPELLI_ADMIN_TITLE = 'Niyet - v2.0.0'
-
-WS_REDIS_HOST = env.str('WS_REDIS_HOST')
-WS_REDIS_PORT = env.str('WS_REDIS_PORT')
 
 ENABLE_SWAGGER_ENDPOINT = True
 
