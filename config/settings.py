@@ -170,7 +170,7 @@ FROM_EMAIL = 'Niyet Team <niyet@gmail.com>'
 
 EMAIL_CONFIG = 'EMAIL_URL'
 
-vars().update(EMAIL_CONFIG)
+# vars().update(EMAIL_CONFIG)
 
 GRAPPELLI_ADMIN_TITLE = 'Niyet - v2.0.0'
 
